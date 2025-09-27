@@ -384,6 +384,20 @@ function addData(index, item) {
                 );
             },
         });
+        if (item.serial_number) {
+            data.push({
+                text: LANGUAGE.copyserial || "Copy Serial",
+                action: function () {
+                    // Credits to ox_lib for this snippet
+                    const clipElem = document.createElement('textarea');
+                    clipElem.value = item.serial_number;
+                    document.body.appendChild(clipElem);
+                    clipElem.select();
+                    document.execCommand('copy'); // Deprecated but still works in most browsers and Clipboard was desactivated in RedM
+                    document.body.removeChild(clipElem);
+                },
+            });
+        }
     }
 
 
