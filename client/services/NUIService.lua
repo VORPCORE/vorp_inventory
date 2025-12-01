@@ -68,7 +68,9 @@ function NUIService.ReloadInventory(inventory, packed)
 	SynPending = false
 end
 
+local inCustomInventory = false
 function NUIService.OpenCustomInventory(name, id, capacity, weight)
+	inCustomInventory = true
 	ApplyPosfx()
 	DisplayRadar(false)
 	SetNuiFocus(true, true)
@@ -143,7 +145,10 @@ function NUIService.CloseInv()
 	InInventory = false
 	TriggerEvent("vorp_stables:setClosedInv", false)
 	TriggerEvent("syn:closeinv")
-	TriggerServerEvent("vorp_inventory:Server:CloseCustomInventory")
+	if inCustomInventory then
+		inCustomInventory = false
+		TriggerServerEvent("vorp_inventory:Server:CloseCustomInventory")
+	end
 end
 
 function NUIService.setProcessingPayFalse()
