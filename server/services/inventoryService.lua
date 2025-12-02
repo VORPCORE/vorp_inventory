@@ -1756,6 +1756,18 @@ function InventoryService.TakeFromCustom(obj)
 			return Core.NotifyObjective(_source, T.fullInventory, 2000)
 		end
 
+		local userWeapons = UsersWeapons.default
+		local weapon = userWeapons[item.id]
+		if weapon then
+			return print(GetPlayerName(_source) .. " tried to take a weapon from:" .. invId .. ", but already has it on main inventory with the same ID:" .. item.id .. "Possible Cheat!!")
+		end
+
+		local _userWeapons = UsersWeapons[invId]
+		local _weapon = _userWeapons[item.id]
+		if not _weapon then
+			return print(GetPlayerName(_source) .. " tried to take a weapon from:" .. invId .. ", but ID doesnt exist Possible Cheat!!")
+		end
+
 		local query = "UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
 		local params = { identifier = sourceIdentifier, weaponId = item.id, charid = sourceCharIdentifier }
 		DBService.updateAsync(query, params)
@@ -1789,7 +1801,13 @@ function InventoryService.TakeFromCustom(obj)
 	else
 		if item.count and amount > item.count then
 			SvUtils.Trem(_source)
-			return print(T.itemExceedsLimit)
+			return print(GetPlayerName(_source) .. " tried to take an item from:" .. invId .. ", but the item count is less than the amount requested:" .. amount .. "Possible Cheat!!")
+		end
+
+		local _userInventory = UsersInventories.default
+		local _item = _userInventory[sourceIdentifier]
+		if _item and _item[item.id] then
+			return print(GetPlayerName(_source) .. " tried to take an item from:" .. invId .. ", but already has it on main inventory with the same ID:" .. item.id .. "Possible Cheat!!")
 		end
 
 		local canCarryItem = InventoryAPI.canCarryItem(_source, item.name, amount)
