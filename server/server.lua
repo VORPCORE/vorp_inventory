@@ -46,13 +46,10 @@ AddEventHandler('playerDropped', function()
         local invId = INVENTORY_IN_USE[_source]
 
         if invId ~= nil then
-            -- Remove for other inventory types
             INVENTORY_IN_USE[_source] = nil
 
-            -- Fetch CustomInventoryInfo
             local customInv = CustomInventoryInfos[invId]
 
-            -- Check if inventory is registered and inUse then set to false
             if customInv and customInv:isInUse() then
                 customInv:setInUse(false)
             end
@@ -106,4 +103,5 @@ RegisterServerEvent("vorp_inventory:Server:CloseCustomInventory", function()
     CustomInventoryInfos[id]:setInUse(false)
     INVENTORY_IN_USE[_source] = nil
 end)
+
 
