@@ -2180,17 +2180,25 @@ exports("addWeaponsToCustomInventory", InventoryAPI.addWeaponsToCustomInventory)
 ---@param item_name string item name
 ---@param item_crafted_id number? item crafted id if defined will return the amount of the item crafted id
 ---@param callback fun(amount: number)? async or sync callback
+---@param metadata table? if contains metadata then we look up for items with the same metadata only
 ---@return number
-function InventoryAPI.getCustomInventoryItemCount(id, item_name, item_crafted_id, callback)
+function InventoryAPI.getCustomInventoryItemCount(id, item_name, item_crafted_id, callback, metadata)
 	if not CustomInventoryInfos[id] then
 		return respond(callback, 0)
 	end
+
+
 
 	local query = "SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;"
 	local arguments = { invType = id, item_name = item_name }
 	if item_crafted_id then
 		query = "SELECT amount as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_crafted_id = @item_crafted_id;"
 		arguments = { invType = id, item_crafted_id = item_crafted_id }
+	end
+
+	if metadata then
+		query = "SELECT SUM(ci.amount) as total_amount FROM character_inventories ci LEFT JOIN items_crafted ic ON ic.id = ci.item_crafted_id WHERE ci.inventory_type = @invType AND ci.item_name = @item_name AND ic.metadata = @metadata;"
+		arguments = { invType = id, item_name = item_name, metadata = json.encode(metadata) }
 	end
 
 	local result = DBService.queryAwait(query, arguments)
