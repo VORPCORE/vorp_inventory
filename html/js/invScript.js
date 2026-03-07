@@ -5,18 +5,21 @@ let imageCache = {};
  * @param {Array} images - The array of images to preload so we can choose to display placeholder or not
  */
 function preloadImages(images) {
-
     $.each(images, function (_, image) {
         const img = new Image();
+
+        let isExternalLink = image.startsWith("http://") || image.startsWith("https://");
+        
+        let srcPath = isExternalLink ? image : `img/items/${image}.png`;
+
         img.onload = () => {
-            imageCache[image] = `url("img/items/${image}.png");`;
+            imageCache[image] = `url("${srcPath}");`;
         };
         img.onerror = () => {
             imageCache[image] = `url("img/items/placeholder.png");`;
         };
-        img.src = `img/items/${image}.png`;
+        img.src = srcPath;
     });
-
 }
 
 /* DROP DOWN BUTTONS MAIN AND SECONDARY INVENTORY */
