@@ -1,34 +1,76 @@
 let imageCache = {};
 
+// Custom Start
+// --- HUD Position speichern/laden ---
+const HUD_POS_KEY = "vorp_inventory_hud_pos";
+
+function saveHudPos() {
+    const hud = document.getElementById("inventoryHud");
+    if (!hud) return;
+
+    const pos = {
+        left: hud.style.left || "",
+        top: hud.style.top || ""
+    };
+
+    localStorage.setItem(HUD_POS_KEY, JSON.stringify(pos));
+}
+
+function applyHudPos() {
+    const hud = document.getElementById("inventoryHud");
+    if (!hud) return;
+
+    const raw = localStorage.getItem(HUD_POS_KEY);
+    if (!raw) return;
+
+    try {
+        const pos = JSON.parse(raw);
+        if (pos.left) hud.style.left = pos.left;
+        if (pos.top) hud.style.top = pos.top;
+    } catch (e) {
+        console.warn("Invalid HUD pos in storage:", e);
+    }
+}
+// Custom End
+
 /**
  * Preload images
  * @param {Array} images - The array of images to preload so we can choose to display placeholder or not
  */
 function preloadImages(images) {
+
     $.each(images, function (_, image) {
+        if (typeof image === "string" && (image.startsWith("http://") || image.startsWith("https://"))) {
+            imageCache[image] = `url("${image}");`;
+            return;
+        }
         const img = new Image();
-
-        let isExternalLink = image.startsWith("http://") || image.startsWith("https://");
-        
-        let srcPath = isExternalLink ? image : `img/items/${image}.png`;
-
         img.onload = () => {
-            imageCache[image] = `url("${srcPath}");`;
+            imageCache[image] = `url("img/items/${image}.png");`;
         };
         img.onerror = () => {
             imageCache[image] = `url("img/items/placeholder.png");`;
         };
-        img.src = srcPath;
+        img.src = `img/items/${image}.png`;
     });
 }
 
-/* DROP DOWN BUTTONS MAIN AND SECONDARY INVENTORY */
+/* DROP DOWN BUTTONS MAIN AND SECONDARY INVENTORY
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.dropdownButton[data-type="clothing"], .dropdownButton1[data-type="clothing"]').forEach(button => {
         button.classList.add('active');
     });
-});
+});*/
 
+// Custom Start
+document.addEventListener('DOMContentLoaded', () => {
+    applyHudPos(); // <- HIER EINFÜGEN
+
+    document.querySelectorAll('.dropdownButton[data-type="clothing"], .dropdownButton1[data-type="clothing"]').forEach(button => {
+        button.classList.add('active');
+    });
+});
+// Custom End
 
 function bindButtonEventListeners() {
     document.querySelectorAll('.dropdownButton[data-type="itemtype"]').forEach(button => {
@@ -279,16 +321,21 @@ $(document).ready(function () {
     });
 });
 
+// Custom Start
 function moveInventory(inv) {
+    // Wenn schon eine gespeicherte Position existiert -> NICHT überschreiben
+    if (localStorage.getItem(HUD_POS_KEY)) return;
+
     const inventoryHud = document.getElementById('inventoryHud');
+    if (!inventoryHud) return;
+
     if (inv === 'main') {
         inventoryHud.style.left = '25%';
     } else if (inv === 'second') {
         inventoryHud.style.left = '1%';
     }
 }
-
-
+// Custom End
 
 function addData(index, item) {
 
@@ -460,8 +507,8 @@ function getDegradationMain(item) {
     const degradationPercentage = getItemDegradationPercentage(item);
     const color = getColorForDegradation(degradationPercentage);
 
-    return `<br>${LANGUAGE.labels.decay}<span style="color: ${color}">${degradationPercentage.toFixed(0)}%</span>`;
-
+    const decayLabel = (LANGUAGE?.labels?.decay) ?? "Verfall ";
+    return `<br>${decayLabel}<span style="color: ${color}">${degradationPercentage.toFixed(0)}%</span>`;
 }
 
 /**
@@ -500,16 +547,22 @@ function loadInventoryItems(item, index, group, count, limit) {
 function loadInventoryWeapons(item, index, group) {
     if (item.type != "item_weapon") return;
 
-    const weight = getItemWeight(item.weight, 1);
-    const info = item.serial_number ? "<br>" + (LANGUAGE.labels?.ammo ?? "Ammo") + item.count + "<br>" + (LANGUAGE.labels?.serial ?? "Serial") + item.serial_number : "";
-    const url = imageCache[item.name]
+    // NEU: Wir entfernen das störende "<br>" am Anfang mit .replace()
+    let weight = getItemWeight(item.weight, 1).replace('<br>', '');
+    
+    const info = item.serial_number ? "<br>" + (LANGUAGE.labels?.ammo ?? "Ammo") + " " + item.count + "<br>" + (LANGUAGE.labels?.serial ?? "Serial") + " " + item.serial_number : "";
+    const url = imageCache[item.name];
     const label = item.custom_label ? item.custom_label : item.label;
 
-    $("#inventoryElement").append(`<div data-label='${label}' data-group='${group}' style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
+    const groupKey = getGroupKey(group);
+    const groupImg = groupKey ? window.Actions[groupKey].img : 'satchel_nav_all.png';
+
+    const tooltipWithIcon = `<img src="img/itemtypes/${groupImg}"> ${weight}${info}`;
+
+    $("#inventoryElement").append(`<div data-label='${label}' data-group='${group}' style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip='${tooltipWithIcon}'>
         <div class='equipped-icon' style='display: ${!item.used && !item.used2 ? "none" : "block"};'></div>
     </div> `);
 }
-
 
 /**
  * Load fixed items in the main inventory
