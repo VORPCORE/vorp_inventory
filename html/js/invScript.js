@@ -1,7 +1,5 @@
 let imageCache = {};
 
-// Custom Start
-// --- HUD Position speichern/laden ---
 const HUD_POS_KEY = "vorp_inventory_hud_pos";
 
 function saveHudPos() {
@@ -31,7 +29,6 @@ function applyHudPos() {
         console.warn("Invalid HUD pos in storage:", e);
     }
 }
-// Custom End
 
 /**
  * Preload images
@@ -55,22 +52,13 @@ function preloadImages(images) {
     });
 }
 
-/* DROP DOWN BUTTONS MAIN AND SECONDARY INVENTORY
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.dropdownButton[data-type="clothing"], .dropdownButton1[data-type="clothing"]').forEach(button => {
-        button.classList.add('active');
-    });
-});*/
-
-// Custom Start
-document.addEventListener('DOMContentLoaded', () => {
-    applyHudPos(); // <- HIER EINFÜGEN
+    applyHudPos();
 
     document.querySelectorAll('.dropdownButton[data-type="clothing"], .dropdownButton1[data-type="clothing"]').forEach(button => {
         button.classList.add('active');
     });
 });
-// Custom End
 
 function bindButtonEventListeners() {
     document.querySelectorAll('.dropdownButton[data-type="itemtype"]').forEach(button => {
@@ -321,9 +309,7 @@ $(document).ready(function () {
     });
 });
 
-// Custom Start
 function moveInventory(inv) {
-    // Wenn schon eine gespeicherte Position existiert -> NICHT überschreiben
     if (localStorage.getItem(HUD_POS_KEY)) return;
 
     const inventoryHud = document.getElementById('inventoryHud');
@@ -335,7 +321,6 @@ function moveInventory(inv) {
         inventoryHud.style.left = '1%';
     }
 }
-// Custom End
 
 function addData(index, item) {
 
