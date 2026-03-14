@@ -4,24 +4,6 @@ if Config.DevMode then
     print("^1[DEV] ^7DEV MODE IS ENABLED, THIS IS NOT FOR PRODUCTION SERVERS")
 end
 
--- waits for all scripts to be loaded to debug registered items and help see issues
-CreateThread(function()
-    local num_scripts <const> = GetNumResources()
-
-    repeat
-        local started_scripts = 0
-        for i = 1, num_scripts do
-            local script <const> = GetResourceByFindIndex(i)
-
-            if GetResourceState(script) == "started" then
-                started_scripts = started_scripts + 1
-            end
-        end
-        Wait(500)
-    until started_scripts >= num_scripts
-
-    TriggerEvent("vorp_inventory:Internal:StartItemDebug")
-end)
 
 RegisterServerEvent("syn:stopscene")
 AddEventHandler("syn:stopscene", function(x)

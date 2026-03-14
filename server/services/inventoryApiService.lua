@@ -202,23 +202,25 @@ function InventoryAPI.registerUsableItem(name, cb, resource)
 	UsableItemsFunctions[name] = cb
 end
 
-AddEventHandler("vorp_inventory:Internal:StartItemDebug", function()
-	print(">>>>>>>>>> ^1DEBUG: Starting item debug ^7 <<<<<<<<<<<<")
-	for name, data in pairs(REGISTERED_ITEMS) do
-		if not ServerItems[name] then
-			print("^3Warning^7: item ", name, " was added as usabled but ^1 does not exist in database ^7")
-		end
+CreateThread(function()
+	SetTimeout(15000, function()
+		print(">>>>>>>>>> ^1DEBUG: Starting item debug ^7 <<<<<<<<<<<<")
+		for name, data in pairs(REGISTERED_ITEMS) do
+			if not ServerItems[name] then
+				print("^3Warning^7: item ", name, " was added as usabled but ^1 does not exist in database ^7")
+			end
 
-		if ServerItems[name] and not ServerItems[name].canUse then
-			print("^3Warning^7: item", name, " is not set asusable in database , ^1 you need to set usable to 1 in items database ^7")
-		end
+			if ServerItems[name] and not ServerItems[name].canUse then
+				print("^3Warning^7: item", name, " is not set asusable in database , ^1 you need to set usable to 1 in items database ^7")
+			end
 
-		if data.count > 1 then
-			print("^3Warning^7: item ", name, " is being registered by multiple resources, ^1 can't register the same item multiple times only one.^7 resources: ", table.concat(data.resources, ", ") or "")
+			if data.count > 1 then
+				print("^3Warning^7: item ", name, " is being registered by multiple resources, ^1 can't register the same item multiple times only one.^7 resources: ", table.concat(data.resources, ", ") or "")
+			end
 		end
-	end
-	table.wipe(REGISTERED_ITEMS)
-	print(">>>>>>>>>> ^1DEBUG: Item debug finished ^7 <<<<<<<<<<<<")
+		table.wipe(REGISTERED_ITEMS)
+		print(">>>>>>>>>> ^1DEBUG: Item debug finished ^7 <<<<<<<<<<<<")
+	end)
 end)
 
 exports("registerUsableItem", InventoryAPI.registerUsableItem)
