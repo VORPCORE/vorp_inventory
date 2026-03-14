@@ -211,7 +211,7 @@ CreateThread(function()
 			end
 
 			if ServerItems[name] and not ServerItems[name].canUse then
-				print("^3Warning^7: item", name, " is not set asusable in database , ^1 you need to set usable to 1 in items database ^7")
+				print("^3Warning^7: item", name, " is not set as usable in database , ^1 you need to set usable to 1 in items database ^7")
 			end
 
 			if data.count > 1 then
