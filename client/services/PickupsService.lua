@@ -324,7 +324,6 @@ CreateThread(function()
 							pressed = true
 
 							if isAnyPlayerNear() == 0 then
-								print(Config.UseGoldItem, pickup.isGold)
 								if pickup.isMoney then
 									local data = { obj = key, uuid = pickup.uuid }
 									TriggerServerEvent("vorpinventory:onPickupMoney", data)
