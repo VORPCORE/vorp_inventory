@@ -505,7 +505,6 @@ local function loadWeapons()
 		weapon.serial_number = currentWeapon:getSerialNumber()
 		weapon.custom_label = currentWeapon:getCustomLabel()
 		weapon.custom_desc = currentWeapon:getCustomDesc()
-		weapon.custom_label = currentWeapon:getCustomLabel()
 		weapon.weight = currentWeapon:getWeight()
 		table.insert(weapons, weapon)
 	end
