@@ -189,7 +189,7 @@ function PickupsService.shareMoneyPickupClient(handle, amount, position, uuid, v
 	if value == 1 then
 		if WorldPickups[handle] == nil then
 			local pickup <const> = {
-				label = T.money .. tostring(amount) .. ")",
+				label = T.money .. " (" .. tostring(amount) .. ")",
 				entityId = 0,
 				amount = amount,
 				isMoney = true,
