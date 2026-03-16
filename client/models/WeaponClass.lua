@@ -346,7 +346,7 @@ function Weapon:getCurrInv()
 end
 
 function Weapon:getGroup()
-	self.group = self.group
+	return self.group
 end
 
 function Weapon:getCustomLabel()
