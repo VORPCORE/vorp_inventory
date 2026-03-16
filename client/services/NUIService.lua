@@ -128,7 +128,7 @@ function NUIService.CloseInv()
 		StoreSynMenu = false
 		GenSynInfo = {}
 		for _, item in pairs(UserInventory) do
-			if item.metadata ~= nil and item.metadata.description ~= nil and item.metadata.orgdescription ~= nil then
+			if item.metadata ~= nil and item.metadata.description ~= nil and (item.metadata.orgdescription ~= nil or item.metadata.orgdescription == "") then
 				if item.metadata.orgdescription == "" then
 					item.metadata.description = nil
 				else
