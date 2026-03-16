@@ -469,7 +469,6 @@ local function loadItems()
 							else
 								item.metadata.orgdescription = ""
 							end
-						else
 						end
 						item.metadata.description = T.cansell .. "<span style=color:Green;>" .. v.price .. "</span>"
 					end
