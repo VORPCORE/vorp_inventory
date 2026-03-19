@@ -747,6 +747,6 @@ function NUIService.ContextMenu(data)
 	if data.event?.client then
 		TriggerEvent(data.event.client, data.event?.arguments, data.itemid)
 	elseif data.event?.server then
-		TriggerServerEvent(data.event.server, data.event?.arguments, data.itemid)
+		TriggerServerEvent("vorpinventory:validateContextMenuEvent", data)
 	end
 end
