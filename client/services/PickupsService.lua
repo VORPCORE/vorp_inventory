@@ -40,11 +40,16 @@ local function getRandomPositionAround(position, radius)
 	return vector3(position.x + dx, position.y + dy, position.z)
 end
 
-local function PlayAnim(AnimationConfig)
+local function playAnim(AnimationConfig)
 	if not AnimationConfig or not AnimationConfig.Enable then return end
 
 	local playerPed <const> = PlayerPedId()
 	local animDict <const> = AnimationConfig.AnimDict
+
+	if not DoesAnimDictExist(animDict) then
+		print("Animation dictionary is not exist: " .. animDict)
+		return
+	end
 
 	if not HasAnimDictLoaded(animDict) then
 		RequestAnimDict(animDict)
@@ -110,10 +115,10 @@ function PickupsService.createPickup(name, amount, metadata, weaponId, id, degra
 	local index <const>     = PickupsService.getUniqueId()
 	local data <const>      = { name = name, obj = index, amount = amount, metadata = metadata, weaponId = weaponId, position = position, id = id, degradation = degradation }
 	if weaponId == 1 then
-		PlayAnim(Config.Animation.Drop.Item)
+		playAnim(Config.Animation.Drop.Item)
 		TriggerServerEvent("vorpinventory:sharePickupServerItem", data)
 	else
-		PlayAnim(Config.Animation.Drop.Weapon)
+		playAnim(Config.Animation.Drop.Weapon)
 		TriggerServerEvent("vorpinventory:sharePickupServerWeapon", data)
 	end
 	Wait(1000)
@@ -132,7 +137,7 @@ function PickupsService.createMoneyPickup(amount)
 	position                = getRandomPositionAround(position, 1)
 	local handle <const>    = PickupsService.getUniqueId()
 	local data <const>      = { handle = handle, amount = amount, position = position }
-	PlayAnim(Config.Animation.Drop.Money)
+	playAnim(Config.Animation.Drop.Money)
 	TriggerServerEvent("vorpinventory:shareMoneyPickupServer", data)
 	Wait(1000)
 	if Config.SFX.MoneyDrop then
@@ -152,7 +157,7 @@ function PickupsService.createGoldPickup(amount)
 	position                = getRandomPositionAround(position, 1)
 	local handle <const>    = PickupsService.getUniqueId()
 	local data <const>      = { handle = handle, amount = amount, position = position }
-	PlayAnim(Config.Animation.Drop.Gold)
+	playAnim(Config.Animation.Drop.Gold)
 	TriggerServerEvent("vorpinventory:shareGoldPickupServer", data)
 	Wait(1000)
 	if Config.SFX.GoldDrop then
@@ -269,7 +274,7 @@ RegisterNetEvent("vorpInventory:shareGoldPickupClient", PickupsService.shareGold
 
 
 function PickupsService.playerPickUpAnim()
-	PlayAnim(Config.Animation.PickUp)
+	playAnim(Config.Animation.PickUp)
 	if Config.SFX.PickUp then
 		PlaySoundFrontend("CHECKPOINT_PERFECT", "HUD_MINI_GAME_SOUNDSET", true, 1)
 	end
