@@ -40,7 +40,7 @@ local function getRandomPositionAround(position, radius)
 	return vector3(position.x + dx, position.y + dy, position.z)
 end
 
-function PlayAnim(AnimationConfig)
+local function PlayAnim(AnimationConfig)
 	if not AnimationConfig or not AnimationConfig.Enable then return end
 
 	local playerPed <const> = PlayerPedId()
