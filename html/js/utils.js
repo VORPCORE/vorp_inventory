@@ -85,8 +85,7 @@ function cacheImage(item) {
 
 /**
  * replaces default data with custom data
- * 
- * reserved key words for metdata: weight, label, image, tooltip, degradation ,description
+ * * reserved key words for metdata: weight, label, image, tooltip, degradation ,description
  * @param {object} item
  * @returns {{ tooltipData: string, degradation: string, image: string, label: string, weight: number, description: string}}
  */
@@ -121,8 +120,7 @@ function getItemMetadataInfo(item, isCustom) {
  * @param {object} item 
  * @param {number} count
  * @returns {string}
- * 
- */
+ * */
 function getItemWeight(weight, count) {
     return weight != null ? `<br>${LANGUAGE.labels?.weight} ${(weight * count).toFixed(2)} ${Config.WeightMeasure}` : `<br>${LANGUAGE.labels?.weight} ${(count / 4).toFixed(2)} ${Config.WeightMeasure}`;
 }
@@ -141,11 +139,19 @@ function getItemWeight(weight, count) {
 function getItemTooltipContent(image, groupKey, group, limit, weight, degradation, tooltipData) {
     const groupImg = groupKey ? window.Actions[groupKey].img : 'satchel_nav_all.png';
     const limitLabel = limit ? (LANGUAGE.labels?.limit || "Kg") + limit : "";
-    const tooltipContent = group > 1 ? `<img src="img/itemtypes/${groupImg}"> ${limitLabel + weight + degradation + tooltipData}` : `${limitLabel}${weight}${degradation}${tooltipData}`;
-    const url = imageCache[image]
+    const tooltipContent = `<img src="img/itemtypes/${groupImg}"> ${limitLabel}${weight}${degradation}${tooltipData}`;
+    
+    let url;
+    if (typeof image === "string" && (image.startsWith("http://") || image.startsWith("https://"))) {
+        url = `url("${image}");`;
+    } else {
+        url = imageCache[image];
+        if (!url || url === "undefined") {
+            url = `url("img/items/${image}.png");`;
+        }
+    }
     return { tooltipContent, url };
 }
-
 
 function initiateSecondaryInventory(title, capacity, weight) {
 
@@ -493,6 +499,7 @@ function giveGetHowManyGold() {
 }
 
 function closeInventory() {
+    if (typeof saveHudPos === "function") saveHudPos();  
     $('.tooltip').remove();
     $.post(`https://${GetParentResourceName()}/NUIFocusOff`, JSON.stringify({}));
     isOpen = false;
