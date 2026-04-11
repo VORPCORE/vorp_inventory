@@ -452,7 +452,7 @@ function initQuickTransferShortcuts() {
     // Remove old handlers to prevent accumulation on re-opens
     $(document).off('.quicktransfer');
 
-    $(document).on('click.quicktransfer', '.item:not(:empty)', function (event) {
+    $(document).on('click.quicktransfer', '.item', function (event) {
         if (!isOpen) return;
         if (Config.QuickTransferSettings?.Enabled === false) return;
 
