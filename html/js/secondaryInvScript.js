@@ -51,6 +51,7 @@ function PostAction(eventName, itemData, id, propertyName, info) {
                     $.post(`https://${GetParentResourceName()}/TransferLimitExceeded`, JSON.stringify({
                         max: Config.MaxItemTransferAmount
                     }));
+
                     dialog.close();
                 } else {
                     PostActionPostQty(eventName, itemData, id, propertyName, value, info);
@@ -393,11 +394,12 @@ function secondInventorySetup(items, info) {
 function quickDirectTransfer(itemData, sourceInventory, qty) {
     // The secondary inventory info is always needed (for both TakeFrom and MoveTo)
     const info = $("#secondInventoryElement").data("info");
+    const transferCooldown = Config.QuickTransferSettings?.TransferCooldown || 500;
 
     if (sourceInventory === "main") {
         // Main inventory -> secondary inventory
         if (type === "store") {
-            disableInventory(500);
+            disableInventory(transferCooldown);
             if (geninfo.isowner != 0) {
                 // Owner: ask for the selling price
                 if (isValidating) return;
@@ -424,17 +426,17 @@ function quickDirectTransfer(itemData, sourceInventory, qty) {
                     JSON.stringify({ item: itemData, type: itemData.type, number: qty, geninfo: geninfo, store: StoreId }));
             }
         } else if (type in ActionMoveList) {
-            disableInventory(500);
+            disableInventory(transferCooldown);
             const { action, id, customtype } = ActionMoveList[type];
             PostActionPostQty(action, itemData, id(), customtype, qty, info);
         }
     } else {
         // Secondary inventory -> main inventory
         if (type === "store") {
-            disableInventory(500);
+            disableInventory(transferCooldown);
             takeFromStoreWithPrice(itemData, qty);
         } else if (type in ActionTakeList) {
-            disableInventory(500);
+            disableInventory(transferCooldown);
             const { action, id, customtype } = ActionTakeList[type];
             PostActionPostQty(action, itemData, id(), customtype, qty, info);
         }
@@ -452,6 +454,7 @@ function initQuickTransferShortcuts() {
 
     $(document).on('click.quicktransfer', '.item:not(:empty)', function (event) {
         if (!isOpen) return;
+        if (Config.QuickTransferSettings?.Enabled === false) return;
 
         const $item = $(this);
         const itemData = $item.data("item");

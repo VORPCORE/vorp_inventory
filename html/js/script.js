@@ -45,6 +45,13 @@ window.addEventListener('message', function (event) {
         Config.DoubleClickToUse = LuaConfig.DoubleClickToUse;
         Config.UseRolItem = LuaConfig.UseRolItem;
         Config.WeightMeasure = LuaConfig.WeightMeasure;
+        if (LuaConfig.QuickTransferSettings) {
+            Config.QuickTransferSettings = {
+                Enabled: LuaConfig.QuickTransferSettings.Enabled !== false,
+                ShowSelectionNotification: LuaConfig.QuickTransferSettings.ShowSelectionNotification === true,
+                TransferCooldown: LuaConfig.QuickTransferSettings.TransferCooldown || 500,
+            };
+        }
         // Fetch the Actions configuration from Lua
         loadActionsConfig().then(actionsConfig => {
             generateActionButtons(actionsConfig, 'carousel1', 'inventoryElement', 'dropdownButton');

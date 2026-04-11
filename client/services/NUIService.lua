@@ -628,6 +628,11 @@ function NUIService.initiateData()
 			DoubleClickToUse = Config.DoubleClickToUse,
 			UseRolItem = Config.UseRolItem,
 			WeightMeasure = Config.WeightMeasure or "Kg",
+			QuickTransferSettings = {
+				Enabled = Config.QuickTransferSettings == nil and true or Config.QuickTransferSettings.Enabled ~= false,
+				ShowSelectionNotification = Config.QuickTransferSettings ~= nil and Config.QuickTransferSettings.ShowSelectionNotification == true or false,
+				TransferCooldown = Config.QuickTransferSettings ~= nil and Config.QuickTransferSettings.TransferCooldown or 500,
+			},
 		}
 	})
 end

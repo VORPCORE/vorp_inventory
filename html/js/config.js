@@ -8,3 +8,8 @@ Config.DoubleClickToUse = true;
 Config.WeightMeasure = "kg";
 Config.MaxItemTransferAmount = 200;
 Config.EnableCopySerial = true;
+Config.QuickTransferSettings = {
+    Enabled: true,
+    ShowSelectionNotification: false,
+    TransferCooldown: 500,
+};
