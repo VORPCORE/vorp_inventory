@@ -230,4 +230,11 @@ Config = {
 		gold_bag = "s_pickup_goldbar01x", -- prop for the gold pickup
 		-- add more here
 	}
+	
+	-- Shift+Clic : deplace toute la pile | Alt+Clic : deplace 1 unite
+	QuickTransferSettings          = {
+		Enabled                   = true, -- Activer/desactiver la fonctionnalite
+		ShowSelectionNotification = false, -- Notification a la mise en surbrillance
+		TransferCooldown          = 500, -- Delai entre transferts (millisecondes)
+	},
 }

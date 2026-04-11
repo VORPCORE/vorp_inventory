@@ -51,7 +51,6 @@ function PostAction(eventName, itemData, id, propertyName, info) {
                     $.post(`https://${GetParentResourceName()}/TransferLimitExceeded`, JSON.stringify({
                         max: Config.MaxItemTransferAmount
                     }));
-                                    
                     dialog.close();
                 } else {
                     PostActionPostQty(eventName, itemData, id, propertyName, value, info);
@@ -382,4 +381,95 @@ function secondInventorySetup(items, info) {
             $("#secondInventoryElement").append(`<div class='item' data-group='0'></div>`);
         }
     }
+}
+
+
+/**
+ * Directly transfers an item (Shift+Click = full stack, Alt+Click = 1 unit)
+ * @param {object} itemData - The item data
+ * @param {string} sourceInventory - "main" or "second"
+ * @param {number} qty - Quantity to transfer
+ */
+function quickDirectTransfer(itemData, sourceInventory, qty) {
+    // The secondary inventory info is always needed (for both TakeFrom and MoveTo)
+    const info = $("#secondInventoryElement").data("info");
+
+    if (sourceInventory === "main") {
+        // Main inventory -> secondary inventory
+        if (type === "store") {
+            disableInventory(500);
+            if (geninfo.isowner != 0) {
+                // Owner: ask for the selling price
+                if (isValidating) return;
+                processEventValidation();
+                dialog.prompt({
+                    title: LANGUAGE.prompttitle2,
+                    button: LANGUAGE.promptaccept,
+                    required: true,
+                    item: itemData,
+                    type: itemData.type,
+                    input: { type: "number", autofocus: "true" },
+                    validate: function (price) {
+                        if (!price) { dialog.close(); return; }
+                        if (isValidating) return;
+                        processEventValidation();
+                        $.post(`https://${GetParentResourceName()}/MoveToStore`,
+                            JSON.stringify({ item: itemData, type: itemData.type, number: qty, price: price, geninfo: geninfo, store: StoreId }));
+                    },
+                });
+            } else {
+                if (isValidating) return;
+                processEventValidation();
+                $.post(`https://${GetParentResourceName()}/MoveToStore`,
+                    JSON.stringify({ item: itemData, type: itemData.type, number: qty, geninfo: geninfo, store: StoreId }));
+            }
+        } else if (type in ActionMoveList) {
+            disableInventory(500);
+            const { action, id, customtype } = ActionMoveList[type];
+            PostActionPostQty(action, itemData, id(), customtype, qty, info);
+        }
+    } else {
+        // Secondary inventory -> main inventory
+        if (type === "store") {
+            disableInventory(500);
+            takeFromStoreWithPrice(itemData, qty);
+        } else if (type in ActionTakeList) {
+            disableInventory(500);
+            const { action, id, customtype } = ActionTakeList[type];
+            PostActionPostQty(action, itemData, id(), customtype, qty, info);
+        }
+    }
+}
+
+/**
+ * Initializes quick transfer shortcuts:
+ *   Shift+Click -> move the full stack
+ *   Alt+Click   -> move 1 unit
+ */
+function initQuickTransferShortcuts() {
+    // Remove old handlers to prevent accumulation on re-opens
+    $(document).off('.quicktransfer');
+
+    $(document).on('click.quicktransfer', '.item:not(:empty)', function (event) {
+        if (!isOpen) return;
+
+        const $item = $(this);
+        const itemData = $item.data("item");
+        if (!itemData) return;
+
+        const sourceInventory = $item.data("inventory") ||
+            ($item.closest("#inventoryElement").length > 0 ? "main" : "second");
+
+        if (event.shiftKey) {
+            // Shift+Click: full stack
+            event.preventDefault();
+            const qty = itemData.type === "item_weapon" ? 1 : itemData.count;
+            quickDirectTransfer(itemData, sourceInventory, qty);
+        } else if (event.altKey) {
+            // Alt+Click: 1 unit
+            event.preventDefault();
+            quickDirectTransfer(itemData, sourceInventory, 1);
+        }
+        // Normal click: existing behavior (drag & drop, context menu)
+    });
 }

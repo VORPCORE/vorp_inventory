@@ -207,7 +207,12 @@ window.addEventListener('message', function (event) {
             closeInventory();
         });
 
+        // Initialize quick transfer shortcuts
+        isOpen = true;
+        initQuickTransferShortcuts();
+
     } else if (event.data.action == "hide") {
+        isOpen = false;
         $('.tooltip').remove();
         $("#inventoryHud").fadeOut();
         $(".controls").fadeOut();
